@@ -1,32 +1,31 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
-print("Opening mokeytype")
+chrome_options = Options()
+chrome_options.add_experimental_option("detach", True)
+driver = webdriver.Chrome(options=chrome_options)
 
-driver = webdriver.Chrome()
+print("Opening monkeytype.com")
 driver.get('https://monkeytype.com/')
 
-# get the thing with two classes
-time.sleep(5)
-
-driver.find_element(By.CLASS_NAME, 'acceptAll').click()
-
-active = driver.find_element(By.CSS_SELECTOR, '.word.active')
-print(active.text)
+WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CLASS_NAME, 'acceptAll'))).click()
+WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.word.active')))
 
 inputSpace = driver.find_element(By.ID, 'wordsInput')
 
-print(inputSpace)
+while True:
+    try:
+        driver.find_element(By.CSS_SELECTOR, "#result.hidden")
+        active = driver.find_element(By.CSS_SELECTOR, '.word.active')
+        inputSpace.send_keys(active.text + " ")
 
-inputSpace.send_keys(active.text + " ")
-time.sleep(1)
+    except:
+        print("Finished Typing")
+        break
 
-active = driver.find_element(By.CSS_SELECTOR, '.word.active')
-print(active.text)
-
-# driver.find_element(By.ID,"CouncilDistInput").send_keys("1408 18th Avenue South, Nashville, TN")
-
-time.sleep(10)
-# closing the driver
-driver.close()
+print("I typed at "
+      + driver.find_element(By.CSS_SELECTOR, '#result > div:nth-child(1) > div.group.wpm > div.bottom').text
+      + " words per minute!")
